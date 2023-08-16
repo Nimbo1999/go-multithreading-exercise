@@ -24,11 +24,7 @@ func (service *CdnApiCepService) GetCep(cep string) {
 		service.Error <- err
 		return
 	}
-	/*
-		Sometimes this api return a 429 Http status code, it means that it is receiving
-		too many requests.
-		For now I'm ignoring it, but later we can verify it and create an error,
-		or just don't commit to the channel and wait for ViaCep or Timeout response.
-	*/
-	service.Channel <- cdnApiCep
+	if cdnApiCep.Ok {
+		service.Channel <- cdnApiCep
+	}
 }

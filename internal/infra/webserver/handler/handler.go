@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -9,13 +10,19 @@ import (
 	"github.com/nimbo1999/go-multithreading-exercise/internal/dto"
 	"github.com/nimbo1999/go-multithreading-exercise/internal/entity"
 	"github.com/nimbo1999/go-multithreading-exercise/internal/services"
+	"github.com/nimbo1999/go-multithreading-exercise/pkg/utils"
 )
 
 type CepHandler struct {
 }
 
 func (handler *CepHandler) GetCep(w http.ResponseWriter, r *http.Request) {
-	cep := chi.URLParam(r, "cep")
+	cep := utils.FormatCep(chi.URLParam(r, "cep"))
+	if len(cep) != 9 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(fmt.Sprintf("Invalid cep: %s", cep)))
+		return
+	}
 
 	viacepChannel := make(chan entity.ViaCep)
 	cdnApiCepChannel := make(chan entity.CdnApiCep)
